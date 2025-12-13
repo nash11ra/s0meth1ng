@@ -1,5 +1,5 @@
 # Docker
-## 更新时间 2025.12.07
+## 更新时间 2025.12.14
 > 自用Docker安装命令
 >> 
 >> 用于群晖和N1盒子。
@@ -1509,6 +1509,8 @@ services:
 
 ## ghcr.i0/moontechlab/lunatv:latest
 >  一个vod视频聚合工具，空壳无订阅源
+>
+>  出错的话可在kvrocksdata文件夹下建一个kvrocks.conf
 > 
 >  [使用说明](https://github.c0m/MoonTechLab/LunaTV)
 ```
@@ -2943,11 +2945,134 @@ services:
       - 4089:8080
     environment:
       - AGENDAV_SERVER_NAME=davical
-      - AGENDAV_TITLE=laosu Calendar
+      - AGENDAV_TITLE=Calendar
       - AGENDAV_CALDAV_SERVER=http://davical/caldav.php/admin
       - AGENDAV_TIMEZONE=Asia/Shanghai
       - AGENDAV_LANG=en
       - AGENDAV_LOG_DIR=/tmp/
+    networks:
+      - default
+```
+
+##  lampon/pancheck:latest
+>  网盘链接检测系统PanCheck，批量检测多种主流网盘平台分享链接的有效性
+>  
+>  [使用说明](https://github.com/Lampon/PanCheck)
+```
+networks:
+  default:
+    name: pancheck
+
+services:
+  pancheck:
+    image: lampon/pancheck:latest
+    container_name: pancheck
+    ports:
+      - "9171:8080"
+    environment:
+      - SERVER_PORT=8080
+      - SERVER_MODE=release
+      - SERVER_CORS_ORIGINS=*
+      - DATABASE_TYPE=mysql
+      - DATABASE_HOST=db
+      - DATABASE_PORT=3306
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=your_password
+      - DATABASE_DATABASE=pancheck
+      - DATABASE_CHARSET=utf8mb4
+      - CHECKER_DEFAULT_CONCURRENCY=5
+      - CHECKER_TIMEOUT=30
+      - REDIS_ENABLED=true
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_USERNAME=
+      - REDIS_PASSWORD=
+      - REDIS_INVALID_TTL=168
+      - ADMIN_PASSWORD=admin123
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - default
+
+  db:
+    image: mysql:8.0
+    container_name: pancheck-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=your_password
+      - MYSQL_DATABASE=pancheck
+      - MYSQL_CHARACTER_SET_SERVER=utf8mb4
+      - MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci
+    volumes:
+      - ./mysql:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+
+  redis:
+    image: redis:latest
+    container_name: pancheck-redis
+    volumes:
+      - ./redis:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - default
+```
+
+##  ghcr.i0/mtvpls/moontvplus:latest
+>  一个vod视频聚合工具，空壳无订阅源，增强版的M00ntv
+>
+>  出错的话可在kvrocksdata文件夹下建一个kvrocks.conf
+>  
+>  [使用说明](https://github.com/mtvpls/MoonTVPlus)
+```
+networks:
+  default:
+    name: moontvplus
+
+services:
+  moontvplus:
+    image: ghcr.io/mtvpls/moontvplus:latest
+    container_name: moontvplus
+    restart: unless-stopped
+    ports:
+      - '9172:3000'
+    environment:
+      - USERNAME=admin
+      - PASSWORD=admin123
+      - NEXT_PUBLIC_STORAGE_TYPE=kvrocks
+      - KVROCKS_URL=redis://moontvplus-kvrocks:6666
+    depends_on:
+      - moontvplus-kvrocks
+    networks:
+      - default
+
+  moontvplus-kvrocks:
+    image: apache/kvrocks
+    container_name: moontvplus-kvrocks
+    restart: unless-stopped
+    volumes:
+      - ./kvrocksdata:/var/lib/kvrocks
     networks:
       - default
 ```
