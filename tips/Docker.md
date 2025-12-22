@@ -1,5 +1,5 @@
 # Docker
-## 更新时间 2025.12.14
+## 更新时间 2025.12.22
 > 自用Docker安装命令
 >> 
 >> 用于群晖和N1盒子。
@@ -3075,4 +3075,19 @@ services:
       - ./kvrocksdata:/var/lib/kvrocks
     networks:
       - default
+```
+
+##  bentopdf/bentopdf:latest
+>  一个PDF处理工具库，类似于StirlingPDF
+>  
+>  [使用说明](https://github.com/alam00000/bentopdf)
+```
+services:
+  bentopdf:
+    image: bentopdf/bentopdf:latest
+    container_name: bentopdf
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+      - '9173:8080'
 ```
