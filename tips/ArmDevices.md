@@ -48,7 +48,7 @@
 
   找一个TF卡，默认系统从TF卡启动
   
-  下载E20C的iStoreOS[固件](https://fw.koolcenter.com/iStoreOS/e20c)
+  下载E20C的[iStoreOS固件](https://fw.koolcenter.com/iStoreOS/e20c)
   
   使用刷写工具例如balenaEtcher刷入TF卡，通电启动
 
