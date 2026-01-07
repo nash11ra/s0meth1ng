@@ -1,6 +1,7 @@
-# N1盒子刷iStoreOS备忘录
+# Arm 设备折腾相关
 
-## 更新时间 2025.10.07
+# 1. N1盒子刷iStoreOS备忘录
+## 更新时间 2026.01.07
 ## 准备工作
 
   找一个大一点的U盘，4G以上的
@@ -34,3 +35,23 @@
   Samba服务开启：先去 网络存储-统一文件管理-用户 添加要使用的用户和密码（不要使用 root 用户，因为 Samba 默认禁止 root 用户登录），再去 服务-网络共享 添加共享目录，名称随意比如我填写N1，路径填写挂载点，比如我这里填写外接硬盘的挂载点/mnt/mydisk，勾选 可浏览，强制root。允许用户处填写上面设置的用户，多个用户使用空格分开。勾选允许匿名用户和继承所有者，创建权限掩码填写0666，目录权限掩码填写0777。VFS对象可填写recycle启用回收站，不用回收站可以不填。
   
   好用的软件包：AirConnect，Aria2下载器，KMS，OpenC1ash，Openlist
+
+  七八年了，最终我这N1盒子寿终正寝了，开不了机。将它的外部数据迁移到群晖虚拟机里面，还好上面的docker数据和文件没啥重要的，有用的几乎都在那个外置的固态上。
+
+  OpenC1ash新版本可能Tun内核不能启动，尝试的办法有，直接上传YAML文件。`/etc/openclash`目录下只有一行的运行配置文件，直接替换成刚才的文件（也就是下载两遍）。运行时的网络栈设置成System。`/etc/openclash/core/clash_meta`目录下的版本换成[MetaCubeX](https://github.com/MetaCubeX/mihomo/releases)的`linux-amd64`版本（这里由于是X86群晖小主机，所以我选的V1）。确保`版本更新`的`检查更新`能正常下载。以及重启。
+
+# 2. E20C刷机备忘录
+## 更新时间 2026.01.07
+## 准备工作
+
+  找一个5V 2A或者2A以上的TYPE-C线和电源适配器
+
+  找一个TF卡，默认系统从TF卡启动
+  
+  下载E20C的iStoreOS[固件](https://fw.koolcenter.com/iStoreOS/e20c)
+  
+  使用刷写工具例如balenaEtcher刷入TF卡，通电启动
+
+  打算等飞牛OS的arm版本公测后，采用[dd写盘的方式](https://wkdaily.cpolar.cn/archives/e20c)把系统写进去
+
+  当然也能采用[传统方式](https://docs.radxa.com/e/e20c/getting-started/install-os)进行刷写
