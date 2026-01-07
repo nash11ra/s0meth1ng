@@ -1,5 +1,11 @@
 # Windows相关
-## 更新时间 2025.04.07
+## 更新时间 2026.01.07
+
+### 1. 解决 Win10 远程桌面连接的错误提示
+
+背景：Windows 10通过系统自带的`mstsc远程桌面`连接到另外一台Windows 10时候总是弹出`无法定位程序输入点_CxxFrameHandler4 于动态链接库`，以及缺失`FXSAPI.DLL`，`FXSTIFF.DLL`，`FXSUI.DLL`错误弹窗，每次远程连接都有
+
+解决方法：也许和打印机相关的驱动有关，我尝试关闭连接时的`本地资源`选项卡中的`打印机`复选框之后，似乎就不怎么弹窗了
 
 ### 2. 使用Dism修复系统与错误
 
@@ -86,7 +92,7 @@ DISM /Unmount-Image /MountDir:C:\REP /Discard
 
 #### 解决办法一：
 
-下载适用于Win10 22H2 x64的FOD光盘（4.87GB），地址： https://software-download.microsoft.com/download/pr/19041.1.191206-1406.vb_release_amd64fre_FOD-PACKAGES_OEM_PT1_amd64fre_MULTI.iso 。双击挂载，假设挂载的盘符为F；
+下载适用于Win10 22H2 x64的FOD光盘（4.87GB），[地址](https://software-download.microsoft.com/download/pr/19041.1.191206-1406.vb_release_amd64fre_FOD-PACKAGES_OEM_PT1_amd64fre_MULTI.iso) 。双击挂载，假设挂载的盘符为F；
 
 以管理员方式运行CMD，执行如下命令（注意：/Source:后面接的是FOD光盘盘符）：
 ```
@@ -96,7 +102,7 @@ dism /Online /add-capability /CapabilityName:Language.Fonts.Hans~~~und-HANS~0.0.
 
 #### 解决办法二：
 
-下载我提取的简体中文补充字体安装包（42MB），[123盘地址](https://www.123865.com/s/m7HUVv-gkSf3) ，假设下载保存为：E:\Downloads\Microsoft-Windows-LanguageFeatures-Fonts-Hans-Package~31bf3856ad364e35~amd64~~.cab；
+下载提取的简体中文补充字体安装包（42MB），[123盘地址](https://www.123865.com/s/m7HUVv-gkSf3) ，假设下载保存为：E:\Downloads\Microsoft-Windows-LanguageFeatures-Fonts-Hans-Package~31bf3856ad364e35~amd64~~.cab；
 
 以管理员方式运行CMD，执行如下命令（注意：/PackagePath:后面接的是CAB安装包的实际路径）：
 ```
