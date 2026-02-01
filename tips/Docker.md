@@ -1,5 +1,5 @@
 # Docker
-## 更新时间 2025.12.22
+## 更新时间 2026.02.02
 > 自用Docker安装命令
 >> 
 >> 用于群晖和N1盒子。
@@ -3090,4 +3090,203 @@ services:
     network_mode: bridge
     ports:
       - '9173:8080'
+```
+
+##  msmkls/daoliyu-music:latest
+>  音乐播放平台工具，类似于Navidrome
+>  
+>  [工具介绍](https://dlyu.cn/index.html)
+>  
+>  [使用说明](https://club.fnnas.com/forum.php?mod=viewthread&tid=38427)
+```
+networks:
+  default:
+    name: daoliyu
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: daoliyu-postgres
+    restart: unless-stopped
+    networks:
+      - default
+    environment:
+      POSTGRES_DB: "daoliyu"
+      POSTGRES_USER: "daoliyu"
+      POSTGRES_PASSWORD: "daoliyupassword"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=200"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "work_mem=32MB"
+      - "-c"
+      - "maintenance_work_mem=256MB"
+      - "-c"
+      - "checkpoint_completion_target=0.9"
+      - "-c"
+      - "wal_buffers=16MB"
+      - "-c"
+      - "port=5433"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U daoliyu -d daoliyu -p 5433"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+  backend:
+    image: msmkls/daoliyu-music:latest
+    container_name: daoliyu-music
+    restart: unless-stopped
+    networks:
+      - default
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DB_PROVIDER: "pg"
+      LOG_LEVEL: "${LOG_LEVEL:-info}"
+      DEBUG: "${DEBUG:-true}"     
+      STREAMING_TRANSCODE_ENABLED: "true"
+      VIDEO_HWACCEL: "vaapi"
+      VIDEO_HWACCEL_DEVICE: "/dev/dri/renderD128"
+      # LIBVA_DRIVER_NAME: "iHD"
+    devices:
+      - /dev/dri:/dev/dri
+    ports:
+      - "9174:4000"
+    volumes:
+      - ./backend-storage:/app/storage
+      - ./media:/data/media
+      - ./audiobooks:/data/audiobooks
+      - ./music-videos:/data/music-videos
+      - ./playlists:/data/playlists
+      - ./plugins:/plugins
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+```
+
+##  ghcr.io/swingmx/swingmusic:latest
+>  又一个音乐播放平台工具，类似于Navidrome
+> 
+>  [使用说明](https://github.com/swingmx/swingmusic)
+```
+services:
+  swingmusic:
+    image: ghcr.io/swingmx/swingmusic:latest
+    container_name: swingmusic
+    network_mode: bridge
+    restart: unless-stopped
+    user: root
+    volumes:
+      - /volume1/Music/Songs:/music
+      - ./config:/config
+    ports:
+      - 9179:1970
+```
+
+##  ghcr.io/technomancer702/nodecast-tv:latest
+>  浏览器里看IPTV
+> 
+>  [使用说明](https://github.com/technomancer702/nodecast-tv)
+```
+services:
+  nodecast-tv:
+    image: ghcr.io/technomancer702/nodecast-tv:latest
+    container_name: nodecast-tv
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+      - "9175:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    devices:
+      - /dev/dri:/dev/dri
+```
+
+##  jerainlvjing/tf-monitor:v1.1
+>  自动监控TF
+> 
+>  [使用说明](https://hub.docker.com/r/jerainlvjing/tf-monitor)
+```
+services:
+  tfmonitor:
+    image: jerainlvjing/tf-monitor:v1.1
+    container_name: tfmonitor
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+      - 9178:2000
+```
+
+##  unilei/kerkerker:latest
+>  一个vod视频聚合工具
+> 
+>  [使用说明](https://github.com/unilei/kerkerker)
+```
+networks:
+  default:
+    name: kerkerker
+    
+services:
+  app:
+    image: unilei/kerkerker:latest
+    container_name: kerkerker-app
+    restart: unless-stopped
+    networks:
+      - default
+    ports:
+      - "9176:3000"
+    environment:
+      NODE_ENV: production
+      ADMIN_PASSWORD: admin1234
+      MONGODB_URI: mongodb://mongodb:27017/kerkerker
+    depends_on:
+      - mongodb
+
+
+  mongodb:
+    image: mongo:7
+    container_name: kerkerker-mongodb
+    restart: unless-stopped
+    networks:
+      - default
+    environment:
+      MONGO_INITDB_DATABASE: kerkerker
+    volumes:
+      - ./data:/data/db
+      - ./config:/data/configdb
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+```
+
+##  kuekhaoyang/kvideo:latest
+>  一个vod视频聚合工具
+> 
+>  [使用说明](https://github.com/KuekHaoYang/KVideo)
+```
+services:
+  kvideo:
+    image: kuekhaoyang/kvideo:latest
+    container_name: kvideo
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+      - 9177:3000
 ```
