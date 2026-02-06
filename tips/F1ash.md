@@ -1,6 +1,6 @@
 # F1ash相关
 
-## 更新时间 2026.01.25
+## 更新时间 2026.02.07
 
 ## 一.下载
   **1.** 猫抓插件，本来是个嗅探扩展，用来嗅探视频和图片，但是可以设置中添加自定义后缀名如swf
@@ -15,6 +15,8 @@
   
   **6.** b站UP主[干大事的魔法师](https://space.bilibili.com/391612294)开发的[下载器](https://www.bilibili.com/video/av115089034187343)，无需flash大厅即可下载和游玩4399的工具，也是只能下单文件swf
 
+  **7.** [夺城之誓](https://decision.mysxl.cn)，[战火英雄X](https://sfhx.mysxl.cn)
+
 ## 二.在线与本地游玩
    **1.** [CefFlashBrowser浏览器](https://github.com/Mzying2001/CefFlashBrowser)
    
@@ -26,14 +28,16 @@
    
    **5.** 国外网站[F1ash博物馆](https://flashmuseum.org)
 
-   **6.** 国内网站[OmiPlay](https://omiplay.com)
+   **6.** 国外网站[https://flasharch.com/
+
+   **7.** 国内网站[OmiPlay](https://omiplay.com)
    
-   **7.** 国内网站[F1ash存档查询](https://flasharchive.azurewebsites.net)
+   **8.** 国内网站[F1ash存档查询](https://flasharchive.azurewebsites.net)
    
-   **8.** 博主[zzbd](https://blog.zzbd.org/cals/flash/)的基于Ruffle的在线游玩工具,其博客也有一些自制的游戏
+   **9.** 博主[zzbd](https://blog.zzbd.org/cals/flash/)的基于Ruffle的在线游玩工具,其博客也有一些自制的游戏
 
-   **9.** 国内的在线游玩网站[Flash保存计划](https://flash.homes)，[Oldswf](https://oldswf.com)，以及[老游戏在线玩](https://zaixianwan.app/consoles/flash)
+   **10.** 国内的在线游玩网站[Flash保存计划](https://flash.homes)，[Oldswf](https://oldswf.com)，以及[老游戏在线玩](https://zaixianwan.app/consoles/flash)
 
-   **10.** GitLab上的CleanF1ash项目，用于安装无广告的F1ash播放器
+   **11.** GitLab上的CleanF1ash项目，用于安装无广告的F1ash播放器
 
-   **11.** StandAlone版本的独立F1ash播放器，通常是单个文件不用安装，国内版本是[这个](https://www.flash.cn/support/debug-downloads)
+   **12.** StandAlone版本的独立F1ash播放器，通常是单个文件不用安装，国内版本是[这个](https://www.flash.cn/support/debug-downloads)
