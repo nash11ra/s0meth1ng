@@ -1,5 +1,5 @@
 # Windows相关
-## 更新时间 2026.01.07
+## 更新时间 2026.02.12
 
 ### 1. 解决 Win10 远程桌面连接的错误提示
 
@@ -112,3 +112,6 @@ dism /Online /Add-Package /PackagePath:"E:\Downloads\Microsoft-Windows-LanguageF
 
 注：在官方补丁出来之前建议暂停Windows更新，因为截至目前有些后续补丁依旧会删除这个FOD。
 
+### 3. Listary
+
+在当前目录用Everything搜索的命令：`关键字`可设置为`ev`，`路径`为Everything的路径:`D:\Everything\Everything.exe`，`参数`为`-p "{current_folder}" -s {query}`
