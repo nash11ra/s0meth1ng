@@ -1,5 +1,5 @@
 # Docker
-## 更新时间 2026.02.02
+## 更新时间 2026.04.05
 > 自用Docker安装命令
 >> 
 >> 用于群晖和N1盒子。
@@ -299,6 +299,36 @@ services:
       - "/volume1/video:/media"
     ports:
       - "8096:8096"
+    restart: unless-stopped
+```
+Rockchip版本的配置文件，虽然有些文件夹没有，但是能运行（网页转码有点问题）
+```
+services:
+  jellyfin:
+    image: nyanmisaka/jellyfin:latest-rockchip
+    container_name: jellyfin
+    privileged: true
+    network_mode: bridge
+    ports:
+      - "8096:8096"
+    volumes:
+      - ./config:/config
+      - ./tmp:/cache
+      - /vol1/1000/video:/media
+    devices:
+      - /dev/dri:/dev/dri
+      - /dev/dma_heap:/dev/dma_heap
+      - /dev/mali0:/dev/mali0
+      - /dev/rga:/dev/rga
+      - /dev/mpp_service:/dev/mpp_service
+      - /dev/iep:/dev/iep
+      - /dev/mpp-service:/dev/mpp-service
+      - /dev/vpu_service:/dev/vpu_service
+      - /dev/hevc_service:/dev/hevc_service
+      - /dev/rkvdec:/dev/rkvdec
+      - /dev/rkvenc:/dev/rkvenc
+      - /dev/vepu:/dev/vepu
+      - /dev/h265e:/dev/h265e
     restart: unless-stopped
 ```
 
