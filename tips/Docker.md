@@ -1,5 +1,5 @@
 # Docker
-## 更新时间 2026.04.05
+## 更新时间 2026.04.19
 > 自用Docker安装命令
 >> 
 >> 用于群晖和N1盒子。
@@ -3319,4 +3319,182 @@ services:
     network_mode: bridge
     ports:
       - 9177:3000
+```
+
+##  codeberg.org/readeck/readeck:latest
+>  收藏剪贴文章的工具，类似于Pocket
+> 
+>  [使用说明](https://readeck.org/en)
+```
+services:
+  readeck:
+    image: codeberg.org/readeck/readeck:latest
+    container_name: readeck
+    network_mode: bridge
+    restart: unless-stopped
+    volumes:
+      - ./data:/readeck
+    ports:
+      - 9180:8000
+    environment:
+      READECK_LOG_LEVEL: info
+      READECK_LOG_FORMAT: text
+    healthcheck:
+      test: ["CMD", "/bin/readeck", "healthcheck", "-config", "config.toml"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+```
+
+##  crpi-90mw3693mrc3nsxp.cn-shanghai.personal.cr.aliyuncs.com/migumigu/embytok:latest
+>  以竖屏方式上下滑动来体验Emby和Jellyfin
+> 
+>  [使用说明](https://github.com/migumigu/EmbyTok/blob/main/README_CN.md)
+```
+services:
+  embytok:
+    image: crpi-90mw3693mrc3nsxp.cn-shanghai.personal.cr.aliyuncs.com/migumigu/embytok:latest
+    container_name: embytok
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "9181:80"
+    environment:
+      - NODE_ENV=production
+```
+
+##  akiralereal/iptv:latest
+>  一个基于 Docker 部署的 IPTV 直播源管理和分发系统，支持 GUI 管理
+> 
+>  [使用说明](https://github.com/akiralereal/iptv)
+```
+services:
+  akiralerealiptv:
+    image: akiralereal/iptv:latest
+    container_name: akiralerealiptv
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "1905:1905"
+    environment:
+      - muserId=
+      - mtoken=
+      - mport=1905
+      - mrateType=3
+```
+
+##  codeberg.org/forgejo/forgejo:14
+>  开源社区版本的Gitea
+> 
+>  [使用说明](https://forgejo.org/docs/latest/admin/installation/docker)
+```
+services:
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:14
+    container_name: forgejo
+    network_mode: bridge
+    restart: unless-stopped
+    environment:
+      - USER_UID=1026
+      - USER_GID=100
+    ports:
+      - "9200:3000"
+      - "2222:22"
+    volumes:
+      - ./forgejo:/data
+      - /etc/localtime:/etc/localtime:ro
+```
+
+##  ghcr.io/thomiceli/opengist:1.12
+>  类似于Github的Gist服务
+> 
+>  [使用说明](https://github.com/thomiceli/opengist)
+```
+services:
+  opengist:
+    image: ghcr.io/thomiceli/opengist:1.12
+    container_name: opengist
+    network_mode: bridge
+    restart: unless-stopped
+    environment:
+      - UID=1026
+      - GID=100
+    ports:
+      - "9201:6157"
+      - "2223:2222"
+    volumes:
+      - ./data:/opengist
+```
+
+##  hurryos/iptvs-app:latest
+>  聚合IPTV服务
+> 
+>  [使用说明](https://blog.humorously.cn/archives/39)
+```
+services:
+  iptvapp:
+    image: hurryos/iptvs-app:latest
+    container_name: iptvapp
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "9205:5000"
+```
+
+##  bitxeno/atvloadly:latest
+>  ATV侧载工具
+> 
+>  [使用说明](https://github.com/bitxeno/atvloadly)
+```
+services:
+  atvloadly:
+    image: bitxeno/atvloadly:latest
+    container_name: atvloadly
+    network_mode: bridge
+    privileged: true
+    restart: unless-stopped
+    ports:
+      - 9206:80/tcp
+    volumes:
+      - ./data:/data
+      - /var/run/dbus:/var/run/dbus
+      - /var/run/avahi-daemon:/var/run/avahi-daemon
+```
+
+##  ghcr.io/pansalut/koffan:latest
+>  一个网页版的购物清单，比较简洁清爽
+> 
+>  [使用说明](https://github.com/PanSalut/Koffan)
+```
+services:
+  koffan:
+    image: ghcr.io/pansalut/koffan:latest
+    container_name: koffan
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "9210:80"
+    volumes:
+      - ./data:/data
+    environment:
+      - APP_PASSWORD=password
+```
+
+##  instituteiptv/iptv-trmas:latest
+>  海外IPTV聚合工具
+> 
+>  [使用说明](https://github.com/KuekHaoYang/KVideo)
+```
+services:
+  iptvtrmas:
+    image: instituteiptv/iptv-trmas:latest
+    container_name: iptvtrmas
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "9212:19890"
+    environment:
+      - ADMIN_USER=myadmin
+      - ADMIN_PASS=secret
+      - PLAY_TOKEN=abc123
 ```
