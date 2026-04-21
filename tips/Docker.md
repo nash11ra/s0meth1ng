@@ -1,5 +1,5 @@
 # Docker
-## 更新时间 2026.04.19
+## 更新时间 2026.04.21
 > 自用Docker安装命令
 >> 
 >> 用于群晖和N1盒子。
@@ -35,6 +35,8 @@
 >> Docker部署多了会产生一些未被使用的镜像，可以先输入`docker images -f dangling=true`列出悬空镜像，然后输入`docker image prune`进行清理
 >>
 >> 如果清理不了可以输入`docker rmi -f 镜像ID`,强制删除
+>>
+>> 可以通过输入`docker ps --format "table {{.Names}}\t{{.Ports}}"`来查询查看所有`运行`容器的端口映射情况
 
 ## youshandefeiyang/allinone:latest
 > 作者新加了鉴权,[使用说明](https://github.com/youshandefeiyang/LiveRedirect/blob/main/Golang/README.md)
