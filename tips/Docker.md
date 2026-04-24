@@ -38,26 +38,25 @@
 >>
 >> 可以通过输入`docker ps --format "table {{.Names}}\t{{.Ports}}"`来查询查看所有`运行`容器的端口映射情况
 >>
->> 可以在终端中通过输入`docker exec -it 容器名 /bin/bash`来进入到某个容器内部终端去执行一些命令（有时候是`/bin/sh`）。例如nextcloud升级时无法网页升级时可以输入`docker exec -it 容器名 /bin/sh`后，输入`./occ upgrade`进行命令行升级
+>> 可以在终端中通过输入`docker exec -it 容器名 /bin/bash`来进入到某个容器内部终端去执行一些命令（有时候是`/bin/sh`）。例如nextcloud无法网页升时，可以输入`docker exec -it nextcloud /bin/bash`后，输入`./occ upgrade`进行命令行升级
 
 ## youshandefeiyang/allinone:latest
-> 作者新加了鉴权,[使用说明](https://github.com/youshandefeiyang/LiveRedirect/blob/main/Golang/README.md)
+> ,[使用说明](https://github.com/youshandefeiyang/LiveRedirect/blob/main/Golang/README.md)
 > 
 ```
-docker run -d --name=allinone -p 35455:35455 --privileged=true --restart=always youshandefeiyang/allinone:latest -tv=true -aesKey=生成的key -userid=TG的id -token=生成的token
+docker run -d --name=allinone -p 35455:35455 --privileged=true --restart=always youshandefeiyang/allinone:latest
 ```
 > 
 ```
 services:
   allinone:
     image: youshandefeiyang/allinone:latest
-    restart: unless-stopped
-    user: root
+    restart: always
     container_name: allinone
     network_mode: bridge
+    user: root
     ports:
-      - "35455:35455"
-    command: -tv=true -aesKey=生成的key -userid=TG的id -token=生成的token
+      - 35455:35455
 ```
 
 ## pixman/pixman:latest
@@ -3486,8 +3485,8 @@ services:
 
 ##  instituteiptv/iptv-trmas:latest
 >  海外IPTV聚合工具
-> 
->  [使用说明](https://github.com/KuekHaoYang/KVideo)
+>
+>  [使用说明](https://hub.docker.com/r/instituteiptv/iptv-trmas)
 ```
 services:
   iptvtrmas:
@@ -3501,4 +3500,23 @@ services:
       - ADMIN_USER=myadmin
       - ADMIN_PASS=secret
       - PLAY_TOKEN=abc123
+```
+
+##  ardovini/viniplay:latest
+>  一个网页版IPTV播放工具，支持多窗口
+> 
+>  [使用说明](https://github.com/ardoviniandrea/ViniPlay)
+```
+services:
+  viniplay:
+    image: ardovini/viniplay:latest
+    container_name: viniplay
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "9213:8998"
+    volumes:
+      - ./data:/data
+    environment:
+      - SESSION_SECRET=随机的长字符串
 ```
