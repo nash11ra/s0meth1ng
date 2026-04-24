@@ -1,5 +1,5 @@
 # Docker
-## 更新时间 2026.04.21
+## 更新时间 2026.04.24
 > 自用Docker安装命令
 >> 
 >> 用于群晖和N1盒子。
@@ -37,6 +37,8 @@
 >> 如果清理不了可以输入`docker rmi -f 镜像ID`,强制删除
 >>
 >> 可以通过输入`docker ps --format "table {{.Names}}\t{{.Ports}}"`来查询查看所有`运行`容器的端口映射情况
+>>
+>> 可以在终端中通过输入`docker exec -it 容器名 /bin/bash`来进入到某个容器内部终端去执行一些命令（有时候是`/bin/sh`）。例如nextcloud升级时无法网页升级时可以输入`docker exec -it 容器名 /bin/sh`后，输入`./occ upgrade`进行命令行升级
 
 ## youshandefeiyang/allinone:latest
 > 作者新加了鉴权,[使用说明](https://github.com/youshandefeiyang/LiveRedirect/blob/main/Golang/README.md)
