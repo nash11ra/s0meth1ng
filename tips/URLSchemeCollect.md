@@ -1,6 +1,6 @@
 # URL Schemes & Intent收集与整理
 
-## 更新时间 2025.09.30
+## 更新时间 2026.04.29
 
 ## 来源与相关文章：
 
@@ -49,6 +49,12 @@
 **直接拨打电话号码** Shell命令 `am start -a android.intent.action.CALL -d tel:电话号码`
 
 **按出拨号盘暗语** Shell命令，比如在root设备上按出Sui的管理界面 `am broadcast -a android.provider.Telephony.SECRET_CODE -d "android_secret_code://784784"`
+
+**直接打开开发者选项中的无线调试页面：** `#Intent;action=android.intent.action.MAIN;component=com.android.settings/.SubSettings;i.%3Asettings%3Asource_metrics=39;S.%3Asettings%3Ashow_fragment_title=%E6%97%A0%E7%BA%BF%E8%B0%83%E8%AF%95;S.%3Asettings%3Ashow_fragment=com.android.settings.development.WirelessDebuggingFragment;B.%3Asettings%3Ais_second_layer_page=false;i.%3Asettings%3Ashow_fragment_title_resid=-1;i.page_transition_type=0;end`
+
+**原生文件管理App：** 包名`com.google.android.documentsui`，类名`com.android.documentsui.LauncherActivity`
+
+**原生语言设置界面：** 包名`com.android.settings`，类名`.Settings$SystemDashboardActivity`
 
 ### 2. 支付宝 `com.eg.android.AlipayGphone`
   常用小程序一般为`alipays://platformapi/startapp?appId=数字`
