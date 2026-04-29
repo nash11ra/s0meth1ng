@@ -40,9 +40,9 @@
 
 **手机激活信息：** 包名`com.miui.cloudservice`，类名`.ui.DeviceActivationInfoActivity`
 
-**手机管家的网络助手：** #Intent;action=miui.intent.action.NETWORKASSISTANT_ENTRANCE;component=com.miui.securitycenter/com.miui.networkassistant.ui.NetworkAssistantActivity;end
+**手机管家的网络助手：** `#Intent;action=miui.intent.action.NETWORKASSISTANT_ENTRANCE;component=com.miui.securitycenter/com.miui.networkassistant.ui.NetworkAssistantActivity;end`
 
-**打开某个应用的应用信息设置：** #Intent;component=com.miui.securitycenter/com.miui.appmanager.ApplicationsDetailsActivity;S.package_name=应用包名;end
+**打开某个应用的应用信息设置：** `#Intent;component=com.miui.securitycenter/com.miui.appmanager.ApplicationsDetailsActivity;S.package_name=应用包名;end`
 
 **小米社区 每日积分签到：** `mio://web.vip.miui.com/page/info/mio/mio/checkIn?ref=longpressshortcuts`
 
