@@ -1,5 +1,5 @@
 # Docker
-## 更新时间 2026.04.24
+## 更新时间 2026.05.07
 > 自用Docker安装命令
 >> 
 >> 用于群晖和N1盒子。
@@ -38,7 +38,7 @@
 >>
 >> 可以通过输入`docker ps --format "table {{.Names}}\t{{.Ports}}"`来查询查看所有`运行`容器的端口映射情况
 >>
->> 可以在终端中通过输入`docker exec -it 容器名 /bin/bash`来进入到某个容器内部终端去执行一些命令（有时候是`/bin/sh`）。例如nextcloud无法网页升时，可以输入`docker exec -it nextcloud /bin/bash`后，输入`./occ upgrade`进行命令行升级
+>> 可以在终端中通过输入`docker exec -it 容器名 /bin/bash`来进入到某个容器内部终端去执行一些命令（有时候是`/bin/sh`）。例如nextcloud无法网页升级时，可以输入`docker exec -it nextcloud /bin/bash`后，输入`./occ upgrade`进行命令行升级
 
 ## youshandefeiyang/allinone:latest
 > ,[使用说明](https://github.com/youshandefeiyang/LiveRedirect/blob/main/Golang/README.md)
@@ -3519,4 +3519,395 @@ services:
       - ./data:/data
     environment:
       - SESSION_SECRET=随机的长字符串
+```
+
+##  ghcr.io/komari-monitor/komari:latest
+>  一款轻量级的自托管服务器监控工具，类似于哪吒，
+>  
+>  这只是个监控的UI，并不是服务端
+> 
+>  [使用说明](https://github.com/komari-monitor/komari/blob/main/docs/README_zh.md)
+```
+services:
+  komari:
+    image: ghcr.io/komari-monitor/komari:latest
+    container_name: komari
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "25774:25774"
+    volumes:
+      - ./data:/app/data
+    environment:
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: password
+```
+
+##  chishin/nginx-proxy-manager-zh:latest
+>  反向代理服务管理，中文汉化版
+> 
+>  [使用说明](https://github.com/NginxProxyManager/nginx-proxy-manager)
+```
+services:
+  npm:
+    image: chishin/nginx-proxy-manager-zh:latest
+    container_name: npm
+    network_mode: bridge
+    restart: always
+    ports:
+      - "9280:80"
+      - "9281:81"
+      - "9243:443"
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+```
+
+##  mrcreativ3001/moonlight-web-stream:latest
+>  一个网页端的月光远程连接页面，注意只需填写IP或域名即可，端口可以留空
+> 
+>  [使用说明](https://github.com/MrCreativ3001/moonlight-web-stream)
+```
+services:
+  moonlightweb:
+    image: mrcreativ3001/moonlight-web-stream:latest
+    container_name: moonlightweb
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "9285:8080"
+      - "40100-40200:40000-40100/udp"
+    environment:
+      - WEBRTC_NAT_1TO1_HOST=192.168.10.100
+```
+
+##  hurryos/playhub:latest
+>  一个解析视频的网页播放器，只是个空壳
+> 
+>  [使用说明](https://github.com/HurryBy/Playhub)
+```
+services:
+  playhub:
+    image: hurryos/playhub:latest
+    container_name: playhub
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "9287:18080"
+```
+
+##  redimp/otterwiki:latest
+>  一个本地的Wiki式的博客工具
+> 
+>  [使用说明](https://github.com/redimp/otterwiki)
+```
+services:
+  otterwiki:
+    image: redimp/otterwiki:latest
+    container_name: otterwiki
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "9289:80"
+    volumes:
+      - ./data:/app-data
+```
+
+##  sissbruecker/linkding:latest
+>  一个本地的书签工具
+> 
+>  [使用说明](https://github.com/sissbruecker/linkding)
+```
+services:
+  linkding:
+    image: sissbruecker/linkding:latest
+    container_name: linkding
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "9291:9090"
+    volumes:
+      - ./data:/etc/linkding/data
+    environment:
+      - LD_SUPERUSER_NAME=admin
+      - LD_SUPERUSER_PASSWORD=admin
+```
+
+##  misskey/misskey:latest
+>  一个去中心化的博客平台
+>  
+>  搭建[参考来源1](https://laosu.tech/2023/02/22/%E5%8E%BB%E4%B8%AD%E5%BF%83%E5%8C%96%E5%BC%80%E6%BA%90%E7%A4%BE%E4%BA%A4%E5%B9%B3%E5%8F%B0Misskey)
+>
+>  搭建[参考来源2](https://blog.sanae.im/posts/docker-misskey/)
+> 
+>  [使用说明](https://misskey-hub.net/en/docs/)
+```
+networks:
+  default:
+    name: misskey
+
+services:
+  web:
+    image: misskey/misskey:latest
+    container_name: misskey-web
+    restart: unless-stopped
+    links:
+      - db
+      - redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "9292:3000"
+    volumes:
+      - ./files:/misskey/files
+      - ./.config:/misskey/.config:ro
+    networks:
+      - default
+
+  redis:
+    image: redis:7-alpine
+    container_name: misskey-redis
+    restart: unless-stopped
+    volumes:
+      - ./rdata:/data
+    healthcheck:
+      test: "redis-cli ping"
+      interval: 5s
+      retries: 20
+    networks:
+      - default
+
+  db:
+    image: postgres:18-alpine
+    container_name: misskey-db
+    restart: unless-stopped
+    volumes:
+      - ./pdata:/var/lib/postgresql
+    healthcheck:
+      test: "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"
+      interval: 5s
+      retries: 20
+    environment:
+      - POSTGRES_USER=misskey
+      - POSTGRES_PASSWORD=misskey
+      - POSTGRES_DB=misskey
+    networks:
+      - default
+```
+>  ./config文件夹的default.yml内容如下
+```
+# 最终用来访问的 URL
+url: http://192.168.10.100:9292
+
+# Misskey服务器应侦听的端口
+port: 3000
+
+# PostgreSQL 设置
+db:
+  host: db
+  port: 5432
+
+  # 数据库名
+  db: misskey
+
+  # 数据库认证，要和 docker-compose.yml 中的设置一致
+  user: misskey
+  pass: misskey
+
+# Redis 设置
+redis:
+  host: redis
+  port: 6379
+
+id: 'aid'
+
+proxyBypassHosts:
+  - api.deepl.com
+  - api-free.deepl.com
+  - www.recaptcha.net
+  - hcaptcha.com
+  - challenges.cloudflare.com
+
+# Sign to ActivityPub GET request (default: true)
+signToActivityPubGet: false
+```
+
+##  bitbus/paopao-ce:latest
+>  PaoPao 是一个 Go 写的轻量级社区
+> 
+>  采用 Gin+Vue 实现的微社区，界面清爽拥有话题、发布短内容、评论等功能，类似于微博或推特
+>
+>  文件`paopao-mysql.sql`直接从[这里](https://github.com/rocboss/paopao-ce/blob/main/scripts/paopao-mysql.sql)下载无需修改
+>
+>  文件`config.yaml.sample`需要将`LocalOSS`中的`Domain`后面的值，从`127.0.0.1:8008`改为域名，或者NAS的IP加端口
+> 
+>  [搭建参考](https://laosu.tech/2024/02/26/%E6%B8%85%E6%96%B0%E6%96%87%E8%89%BA%E7%9A%84%E5%BE%AE%E7%A4%BE%E5%8C%BAPaoPao)
+>
+>  [使用说明](https://github.com/rocboss/paopao-ce/)
+```
+networks:
+  default:
+    name: paopao
+
+services:
+  backend:
+    image: bitbus/paopao-ce:latest
+    container_name: paopao-web
+    restart: unless-stopped
+    ports:
+      - 9293:8008
+    networks:
+      - default
+    volumes:
+      - ./config.yaml.sample:/app/paopao-ce/config.yaml
+      - ./data:/app/paopao-ce/custom
+    depends_on:
+      - db
+      - redis
+      - meili
+
+      
+  db:
+    image: mysql:8.0
+    container_name: paopao-db
+    restart: unless-stopped
+    # ports:
+    #  - 3306:3306
+    networks:
+      - default
+    volumes:
+      - ./paopao-mysql.sql:/docker-entrypoint-initdb.d/paopao.sql
+      - ./mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: paopao
+      MYSQL_USER: paopao
+      MYSQL_PASSWORD: paopao
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+
+  redis:
+    image: redis/redis-stack:7.2.0-v2
+    container_name: paopao-redis
+    restart: unless-stopped
+    networks:
+      - default
+    # ports:
+    #  - 6379:6379
+    environment:
+      REDISEARCH_ARGS: "MAXSEARCHRESULTS 5"
+  
+  meili:
+    image: getmeili/meilisearch:v1.7
+    container_name: paopao-meili
+    restart: unless-stopped
+    # ports:
+    #  - 7700:7700
+    volumes:
+      - ./meili_data:/meili_data
+    environment:
+      - MEILI_MASTER_KEY=paopao-meilisearch
+    networks:
+      - default
+```
+
+##  ghcr.io/toeverything/affine:stable
+>  一个类似于Notion的白板笔记工具
+> 
+>  快速迭代中，功能可能不稳定
+>
+>  搭建参考，[来源](https://github.com/toeverything/AFFiNE/blob/canary/.docker/selfhost/compose.yml)
+> 
+>  [使用说明](https://affine.pro)
+```
+networks:
+  default:
+    name: affine
+
+services:
+  affine:
+    image: ghcr.io/toeverything/affine:stable
+    container_name: affine
+    restart: unless-stopped
+    ports:
+      - 9290:3010
+    volumes:
+      - ./storage:/root/.affine/storage
+      - ./config:/root/.affine/config
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      affine_migration:
+        condition: service_completed_successfully
+    environment:
+      - REDIS_SERVER_HOST=redis
+      - DATABASE_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@postgres:5432/${DB_DATABASE:-affine}
+      - AFFINE_INDEXER_ENABLED=false
+    networks:
+      - default
+
+  affine_migration:
+    image: ghcr.io/toeverything/affine:stable
+    container_name: affine_migration_job
+    volumes:
+      - ./storage:/root/.affine/storage
+      - ./config:/root/.affine/config
+    command: ['sh', '-c', 'node ./scripts/self-host-predeploy.js']
+    env_file:
+      - .env
+    environment:
+      - REDIS_SERVER_HOST=redis
+      - DATABASE_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@postgres:5432/${DB_DATABASE:-affine}
+      - AFFINE_INDEXER_ENABLED=false
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - default
+
+  redis:
+    image: redis
+    container_name: affine_redis
+    healthcheck:
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - default
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: affine_postgres
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE:-affine}
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test:
+        ['CMD', 'pg_isready', '-U', "${DB_USERNAME}", '-d', "${DB_DATABASE:-affine}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - default
+```
+>  .env 内容如下
+```
+DB_USERNAME=affine
+DB_PASSWORD=
+DB_DATABASE=affine
 ```
