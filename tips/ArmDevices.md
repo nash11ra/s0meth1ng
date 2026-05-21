@@ -1,7 +1,7 @@
 # Arm 设备折腾相关
 
 # 1. N1盒子刷iStoreOS备忘录
-## 更新时间 2026.01.07
+## 更新时间 2026.05.21
 ## 准备工作
 
   找一个大一点的U盘，4G以上的
@@ -38,8 +38,12 @@
 
   七八年了，最终我这N1盒子寿终正寝了，开不了机。将它的外部数据迁移到群晖虚拟机里面，还好上面的docker数据和文件没啥重要的，有用的几乎都在那个外置的固态上。
 
-  OpenC1ash新版本可能Tun内核不能启动，尝试的办法有，直接上传YAML文件。`/etc/openclash`目录下只有一行的运行配置文件，直接替换成刚才的文件（也就是下载两遍）。运行时的网络栈设置成System。`/etc/openclash/core/clash_meta`目录下的版本换成[MetaCubeX](https://github.com/MetaCubeX/mihomo/releases)的`linux-amd64`版本（这里由于是X86群晖小主机，所以我选的V1）。确保`版本更新`的`检查更新`能正常下载。以及重启。
+  由于是群晖虚拟机，需要安装Guest Tool，Openwrt下则是先在终端中输入`opkg update`，然后安装QEMU guest-agent，即输入`opkg install qemu-ga`，最后输入`reboot`重启后，群晖的虚拟机管理面板上就有IP地址等信息了。
 
+  可以在这个虚拟机设置中的其他，打开自动启动，这样物理机启动的时候，虚拟机也会启动。
+
+  OpenC1ash新版本可能Tun内核不能启动，尝试的办法有，直接上传YAML文件。`/etc/openclash`目录下只有一行的运行配置文件，直接替换成刚才的文件（也就是下载两遍）。运行时的网络栈设置成System。`/etc/openclash/core/clash_meta`目录下的版本换成[MetaCubeX](https://github.com/MetaCubeX/mihomo/releases)的`linux-amd64`版本（这里由于是X86群晖小主机，所以我选的V1）。确保`版本更新`的`检查更新`能正常下载。以及重启。
+  
 # 2. E20C刷机备忘录
 ## 更新时间 2026.01.07
 ## 准备工作
