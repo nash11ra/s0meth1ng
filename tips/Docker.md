@@ -1,5 +1,5 @@
 # Docker
-## 更新时间 2026.05.07
+## 更新时间 2026.05.22
 > 自用Docker安装命令
 >> 
 >> 用于群晖和N1盒子。
@@ -1443,15 +1443,17 @@ services:
 > 
 >  有时遇到nextcloud更新，提示`使用命令行更新程序`
 > 
->  解决方法是在docker的终端里，进入nextcloud的容器，cd到有`occ`文件的那个文件夹，输入`./occ upgrade`即可
+>  解决方法是在docker的终端里，进入`nextcloud`的容器，cd到有`occ`文件的那个文件夹，输入`./occ upgrade`即可
 > 
 >  nextcloud不设置，会直接下载文件，而不会在线预览，需要onlyoffice的JWT密钥
 > 
->  解决方法是在docker的终端里，进入onlyoffice的容器，直接输入`documentserver-jwt-status.sh`即可
+>  解决方法是在docker的终端里，进入`onlyoffice`的容器，直接输入`documentserver-jwt-status.sh`即可
 > 
 >  nextcloud的onlyoffice需要设置`关闭证书校验`
 > 
 >  [Saber](https://saber.adil.hanney.org)需要在最底下的`高级`，设置`允许不安全的连接`
+>
+>  某次更新后发现onlyoffice的在线预览不显示，找了很久，才发现是`uBlock Origin`插件，屏蔽了Onlyoffice的一个名叫`Analytics`的本地js文件，真的气人
 ```
 networks:
   default:
