@@ -1,5 +1,5 @@
 # Docker
-## 更新时间 2026.05.22
+## 更新时间 2026.06.10
 > 自用Docker安装命令
 >> 
 >> 用于群晖和N1盒子。
@@ -60,7 +60,7 @@ services:
 ```
 
 ## pixman/pixman:latest
-> [使用说明](https://pixman.io/topics/17)
+> [使用说明](https://pixman.io/topics/17)，目前已经失效
 > 
 ```
 docker run -d --name=pixman -p 35456:5000 --restart=always pixman/pixman:latest
@@ -84,17 +84,27 @@ services:
 > [使用说明](https://github.com/1activegeek/docker-airconnect)
 >
 > 群晖可以安装[套件版](https://github.com/eizedev/AirConnect-Synology)，OpenWRT系统可以安装[LUCI版](https://github.com/sbwml/luci-app-airconnect)
+>
+> 发现似乎对多网卡的软路由的支持不是很好，也可能是我不会配置
+>
+> 群晖系统自从使用了虚拟机以及多网口后，airconnect就一直发现不了dlna音箱
+>
+> 飞牛系统也同样是，网络开启了ovs之后，也是发现不了dlna音箱，只能关闭ovs（ovs关闭后虚拟机的网络会出问题，不过不用虚拟机问题不大）
 ```
-docker run -d --name=airconnect --net=host 1activegeek/airconnect:latest
+docker run -d --name=airconnect --net=host --restart always 1activegeek/airconnect:latest
 ```
 > 
 ```
 services:
     airconnect:
+        image: 1activegeek/airconnect:latest
         container_name: airconnect
         network_mode: host
-        image: 1activegeek/airconnect:latest
-
+        restart: always
+# 飞牛单网口设备（关闭ovs后）加了下面的环境变量能发现dlna音箱，更多参数可以看使用说明里的介绍
+    environment:
+      - AIRCAST_VAR=kill # 不开启发现Chromecast设备的功能
+      - AIRUPNP_VAR="-b NAS所在的IP" # 指定IP到NAS设备上，比如NAS在192.168.1.10上面
 ```
 
 
@@ -1910,9 +1920,9 @@ services:
 >  [使用说明](https://github.com/fish2018/pansou-web)
 ```
 services:
-  pansou:
+  pansou-web:
     image: ghcr.io/fish2018/pansou-web:latest
-    container_name: pansou
+    container_name: pansou-web
     restart: unless-stopped
     network_mode: bridge
     ports:
@@ -1921,10 +1931,11 @@ services:
       - DOMAIN=localhost
       - PANSOU_PORT=8888
       - PANSOU_HOST=127.0.0.1
-      - ENABLED_PLUGINS=labi,zhizhen,shandian,duoduo,muou,wanou
+      - ENABLED_PLUGINS=ddys,erxiao,hdr4k,jutoushe,labi,libvio,lou1,panta,susu,wanou,xuexizhinan,zhizhen,ahhhhfs,alupan,ash,clxiong,discourse,djgou,duoduo,hdmoli,huban,jsnoteclub,kkmao,leijing,lingjisp,meitizy,mikuclub,muou,nsgame,ouge,panyq,panzun,quarktv,shandian,xinjuc,ypfxw,yunsou,aikanzy,bixin,cldi,clmao,cyg,daishudj,duanjuw,feikuai,fox4k,gaoqing888,gying,haisou,hunhepan,jikepan,jupansou,kkv,melost,miaoso,mizixing,nyaa,pan666,panlian,pansearch,panwiki,pianku,qingying,qiwei,qqpd,quark4k,quarksoo,qupanshe,qupansou,sdso,sousou,thepiratebay,weibo,wuji,xb6v,xdpan,xdyh,xiaoji,xiaozhang,xys,yiove,yuhuage,yulinshufa,yunso,zxzj,dyyj,dyyjpro
+      - CHANNELS=tgsearchers7,Aliyun_4K_Movies,bdbdndn11,yunpanx,bsbdbfjfjff,yp123pan,sbsbsnsqq,yunpanxunlei,tianyifc,BaiduCloudDisk,txtyzy,peccxinpd,gotopan,PanjClub,kkxlzy,baicaoZY,MCPH01,MCPH02,MCPH03,bdwpzhpd,ysxb48,jdjdn1111,yggpan,MCPH086,zaihuayun,Q66Share,ucwpzy,shareAliyun,alyp_1,dianyingshare,Quark_Movies,XiangxiuNBB,ydypzyfx,ucquark,xx123pan,yingshifenxiang123,zyfb123,tyypzhpd,tianyirigeng,cloudtianyi,hdhhd21,Lsp115,oneonefivewpfx,qixingzhenren,taoxgzy,Channel_Shares_115,tyysypzypd,vip115hot,wp123zy,yunpan139,yunpan189,yunpanuc,yydf_hzl,leoziyuan,Q_dongman,yoyokuakeduanju,TG654TG,WFYSFX02,QukanMovie,yeqingjie_GJG666,movielover8888_film3,Baidu_netdisk,D_wusun,FLMdongtianfudi,KaiPanshare,QQZYDAPP,rjyxfx,PikPak_Share_Channel,btzhi,newproductsourcing,cctv1211,duan_ju,QuarkFree,yunpanNB,kkdj001,xxzlzn,pxyunpanxunlei,jxwpzy,kuakedongman,liangxingzhinan,xiangnikanj,solidsexydoll,guoman4K,zdqxm,kduanju,cilidianying,CBduanju,SharePanFilms,dzsgx,BooksRealm,Oscar_4Kmovies,douerpan,baidu_yppan,Q_jilupian,Netdisk_Movies,yunpanquark,ammmziyuan,ciliziyuanku,cili8888,jzmm_123pan,Q_dianying,domgmingapk,dianying4k,q_dianshiju,tgbokee,ucshare,godupan,gokuapan,gimy115,WFYSFX03,peccxin,Movie888035,xlwpzy,zyywpzy,wydwpzy,gimy100,ucshare,gimy115iso,aliyunys,clouddriveresources,XunLeiPinDao,ydwpzy,a123fxme,WPpindao,kuyupan,djya5,pan_guangya
     volumes:
-      - /volume1/docker/pansou/data:/app/data
-      - /volume1/docker/pansou/logs:/app/logs
+      - ./data:/app/data
+      - ./logs:/app/logs
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/api/health"]
       interval: 30s
