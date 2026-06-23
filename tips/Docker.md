@@ -1,5 +1,5 @@
 # Docker
-## 更新时间 2026.06.10
+## 更新时间 2026.06.23
 > 自用Docker安装命令
 >> 
 >> 用于群晖和N1盒子。
@@ -89,7 +89,7 @@ services:
 >
 > 群晖系统自从使用了虚拟机以及多网口后，airconnect就一直发现不了dlna音箱
 >
-> 飞牛系统也同样是，网络开启了ovs之后，也是发现不了dlna音箱，只能关闭ovs（ovs关闭后虚拟机的网络会出问题，不过不用虚拟机问题不大）
+> 飞牛系统也同样是，网络开启了ovs之后，也是发现不了dlna音箱，只能关闭ovs（ovs关闭后虚拟机的网络会出问题，不知道是什么原理）
 ```
 docker run -d --name=airconnect --net=host --restart always 1activegeek/airconnect:latest
 ```
@@ -119,7 +119,7 @@ docker run -d --name=iptv-sources -p 35457:8080 herberthe0229/iptv-sources:lates
 services:
   iptv-sources:
     image: herberthe0229/iptv-sources:latest
-    restart: always
+    restart: unless-stopped
     container_name: iptv-sources
     user: root
     network_mode: bridge
@@ -133,14 +133,14 @@ services:
 > [使用说明](https://github.com/tindy2013/subconverter/blob/master/README-cn.md)
 >
 ```
-docker run -d --name=subconverter -p 25500:25500 --restart=always tindy2013/subconverter:latest
+docker run -d --name=subconverter -p 25500:25500 --restart=unless-stopped tindy2013/subconverter:latest
 ```
 > 
 ```
 services:
   subconverter:
     image: tindy2013/subconverter:latest
-    restart: always
+    restart: unless-stopped
     container_name: subconverter
     user: root
     network_mode: bridge
@@ -156,14 +156,14 @@ services:
 > [使用说明](https://github.com/asdlokj1qpi23/subconverter/blob/master/README-cn.md)
 >
 ```
-docker run -d --name=subc0nverter -p 25501:25500 --restart=always asdlokj1qpi23/subconverter:latest
+docker run -d --name=subc0nverter -p 25501:25500 --restart=unless-stopped asdlokj1qpi23/subconverter:latest
 ```
 > 
 ```
 services:
   subc0nverter:
     image: asdlokj1qpi23/subconverter:latest
-    restart: always
+    restart: unless-stopped
     container_name: subc0nverter
     user: root
     network_mode: bridge
@@ -176,14 +176,14 @@ services:
 >
 > 是前端页面，但是不能选本地后端
 ```
-docker run -d --name=sub-web-modify -p 25501:80 --privileged=true --restart=always youshandefeiyang/sub-web-modify:latest
+docker run -d --name=sub-web-modify -p 25501:80 --privileged=true --restart=unless-stopped youshandefeiyang/sub-web-modify:latest
 ```
 > 
 ```
 services:
   sub-web-modify:
     image: youshandefeiyang/sub-web-modify:latest
-    restart: always
+    restart: unless-stopped
     container_name: sub-web-modify
     user: root
     network_mode: bridge
@@ -379,8 +379,30 @@ services:
 >
 > 需要在右上角设置下载目录为/config/baidunetdiskdownload
 >
-> 并未在N1上部署，因为N1芯片很弱，假如下载拉满，带宽不足，很有可能N1的后台都进不去，故无Docker CLI,不过可以自己用[这个网站](https://www.decomposerize.com)来转换
+> 新版8.5.2.427开始塞进AI，建议部署老版本的，也就是停留在4.17.8版本，镜像拉取版本为johngong/baidunetdisk:v_4.17.8_4.11.3_amd64
+>
+> 并未在N1上部署，因为arm机器芯片一般都很弱，假如下载拉满，带宽不足，很有可能N1的后台都进不去，故无Docker CLI,不过可以自己用[这个网站](https://www.decomposerize.com)来转换
 > 
+```
+services:
+  baidunetdisknoai:
+    image: johngong/baidunetdisk:v_4.17.8_4.11.3_amd64
+    container_name: baidunetdisknoai
+    network_mode: bridge
+    user: root
+    environment:
+      - NOVNC_LANGUAGE="zh_Hans"
+      - USER_ID=0
+      - GROUP_ID=0
+    ports:
+      - 5250:5800
+      - 5910:5900
+    volumes:
+      - ./configs:/config
+      - /volume1/Download/bdDLs:/config/baidunetdiskdownload
+    restart: unless-stopped
+```
+> 新的加了AI的版本部署方式如下，需要根据作者的使用说明添加ulimits和shm_size参数，否则连登录界面都进不去
 ```
 services:
   baidunetdisk:
@@ -398,6 +420,11 @@ services:
     volumes:
       - /volume1/docker/baidunetdisk/configs:/config
       - /volume1/Download/bdDLs:/config/baidunetdiskdownload
+    ulimits:
+        memlock:
+            soft: -1
+            hard: -1
+    shm_size: 128mb
     restart: unless-stopped
 ```
 
@@ -664,7 +691,7 @@ services:
   gitea:
     image: gitea/gitea:latest
     container_name: gitea
-    restart: always
+    restart: unless-stopped
     network_mode: bridge
     user: root
     volumes:
@@ -708,7 +735,7 @@ services:
   reader3:
     image: hectorqin/reader:latest
     container_name: reader3
-    restart: always
+    restart: unless-stopped
     network_mode: bridge
     ports:
       - 8993:8080
@@ -750,7 +777,7 @@ services:
     container_name: metacubexd
     user: root
     network_mode: bridge
-    restart: always
+    restart: unless-stopped
     ports:
       - 8998:80
 ```
@@ -825,7 +852,7 @@ services:
     container_name: emby
     network_mode: bridge
     privileged: true
-    restart: always
+    restart: unless-stopped
     environment:
       - UID=0
       - GID=0
@@ -1035,7 +1062,7 @@ services:
     container_name: xiaoyatvbox
     user: root
     network_mode: bridge
-    restart: always
+    restart: unless-stopped
     ports:
       - 5344:80
       - 4567:4567
@@ -2158,7 +2185,7 @@ services:
   dockercopilot:
     image: 0nlylty/dockercopilot:latest
     container_name: dockercopilot
-    restart: always
+    restart: unless-stopped
     network_mode: bridge
     privileged: true
     ports:
@@ -2740,7 +2767,7 @@ services:
   kkfileview:
     image: keking/kkfileview:latest
     container_name: kkfileview
-    restart: always
+    restart: unless-stopped
     network_mode: bridge
     ports:
       - 9160:8012
@@ -2811,7 +2838,7 @@ services:
   easynvr:
     image: registry.cn-shanghai.aliyuncs.com/rustc/easynvr_amd64:latest
     container_name: easynvr
-    restart: always
+    restart: unless-stopped
     network_mode: host
     logging:
       options:
@@ -3566,7 +3593,7 @@ services:
     image: chishin/nginx-proxy-manager-zh:latest
     container_name: npm
     network_mode: bridge
-    restart: always
+    restart: unless-stopped
     ports:
       - "9280:80"
       - "9281:81"
