@@ -1,6 +1,6 @@
 # URL Schemes & Intent收集与整理
 
-## 更新时间 2026.04.29
+## 更新时间 2026.07.21
 
 ## 来源与相关文章：
 
@@ -32,6 +32,8 @@
 
 **原生电池优化界面：** 包名`com.android.settings`，类名`.Settings$HighPowerApplicationsActivity`
 
+**蓝牙设备界面：** 包名`com.android.settings`，类名`.Settings$BluetoothSettingsActivity`
+
 **最近任务：** 包名`com.miui.home`，类名`.recents.RecentsActivity`
 
 **原生系统内存显示：** 包名`com.android.settings`，类名`.Settings$MemorySettingsActivity`
@@ -52,9 +54,13 @@
 
 **直接打开开发者选项中的无线调试页面：** `#Intent;action=android.intent.action.MAIN;component=com.android.settings/.SubSettings;i.%3Asettings%3Asource_metrics=39;S.%3Asettings%3Ashow_fragment_title=%E6%97%A0%E7%BA%BF%E8%B0%83%E8%AF%95;S.%3Asettings%3Ashow_fragment=com.android.settings.development.WirelessDebuggingFragment;B.%3Asettings%3Ais_second_layer_page=false;i.%3Asettings%3Ashow_fragment_title_resid=-1;i.page_transition_type=0;end`
 
+**直接打开开发者选项中的无线调试页面（活动版）：** 包名`com.android.settings`，类名`com.android.settings.SubSettings`，额外的Intent Extras值：类型为`String`，key为`:settings:show_fragment`，value为`com.android.settings.development.WirelessDebuggingFragment`
+
 **原生文件管理App：** 包名`com.google.android.documentsui`，类名`com.android.documentsui.LauncherActivity`
 
 **原生语言设置界面：** 包名`com.android.settings`，类名`.Settings$SystemDashboardActivity`
+
+**查看电池循环次数：** 包名`com.android.settings`，类名`com.android.settings.SubSettings`，额外的Intent Extras值：类型为`String`，key为`:settings:show_fragment`，value为`com.android.settings.deviceinfo.batteryinfo.BatteryInfoFragment`
 
 ### 2. 支付宝 `com.eg.android.AlipayGphone`
   常用小程序一般为`alipays://platformapi/startapp?appId=数字`
