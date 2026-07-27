@@ -1,5 +1,5 @@
 # Docker
-## 更新时间 2026.06.23
+## 更新时间 2026.07.27
 > 自用Docker安装命令
 >> 
 >> 用于群晖和N1盒子。
@@ -37,6 +37,8 @@
 >> 如果清理不了可以输入`docker rmi -f 镜像ID`,强制删除
 >>
 >> 可以通过输入`docker ps --format "table {{.Names}}\t{{.Ports}}"`来查询查看所有`运行`容器的端口映射情况
+>>
+>> 可以通过输入`docker inspect --format='{{json .Mounts}}' 容器名称或id | jq .`来查询查看所有`运行`容器的volume映射情况
 >>
 >> 可以在终端中通过输入`docker exec -it 容器名 /bin/bash`来进入到某个容器内部终端去执行一些命令（有时候是`/bin/sh`）。例如nextcloud无法网页升级时，可以输入`docker exec -it nextcloud /bin/bash`后，输入`./occ upgrade`进行命令行升级
 
@@ -3950,4 +3952,43 @@ services:
 DB_USERNAME=affine
 DB_PASSWORD=
 DB_DATABASE=affine
+```
+
+##  johngong/calibre-web:latest
+>  一个用来管理书籍的工具，johngong版本带有格式转换补丁
+>
+>  并不会自动放入图书触发扫描图书，也可能我不会操作
+>
+>  关于pdf封面不显示，参考了这个博主的[文章](https://winotmk.github.io/240925_calibre_web%E7%9A%84pdf%E5%B0%81%E9%9D%A2%E6%8F%90%E5%8F%96%E9%97%AE%E9%A2%98/)
+>
+>  解决方法：首先先进入到docker容器内部，比如这里容器叫做calibre，输入`docker exec -it calibre /bin/bash`，然后输入`apk add --no-cache imagemagick imagemagick-pdf`，最后重启容器即可
+> 
+>  [使用说明](https://hub.docker.com/r/johngong/calibre-web)
+```
+services:
+  calibre:
+    image: johngong/calibre-web:latest
+    container_name: calibre
+    network_mode: bridge
+    restart: unless-stopped
+    environment:
+      - UID=0
+      - GID=0
+      - ENABLE_AUTOADDBOOKS=true
+      - ENABLE_CALIBRE_SERVER=true
+      - ENABLE_CALIBRE_SERVER_OPDS=true
+      - ENABLE_CALIBREDB_URLLIBRARYPATH=true
+      - CALIBRE_SERVER_RESTART_AUTO=true
+      - CALIBRE_SERVER_USER=nashira
+      - CALIBRE_SERVER_PASSWORD=nashira
+      - CALIBRE_SERVER_WEB_LANGUAGE=zh_CN
+      - CALIBRE_WEB_LANGUAGE=zh_Hans_CN
+      - CALIBRE_ASCII_FILENAME=false
+    volumes:
+      - ./config:/config
+      - /volume2/books/pdf:/library
+      - /volume2/books/autoaddbooks:/autoaddbooks
+    ports:
+      - 9298:8080
+      - 9299:8083
 ```
