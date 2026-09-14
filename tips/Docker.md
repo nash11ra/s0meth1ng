@@ -1,5 +1,5 @@
 # Docker
-## 更新时间 2026.07.27
+## 更新时间 2026.09.15
 > 自用Docker安装命令
 >> 
 >> 用于群晖和N1盒子。
@@ -41,6 +41,8 @@
 >> 可以通过输入`docker inspect --format='{{json .Mounts}}' 容器名称或id | jq .`来查询查看所有`运行`容器的volume映射情况
 >>
 >> 可以在终端中通过输入`docker exec -it 容器名 /bin/bash`来进入到某个容器内部终端去执行一些命令（有时候是`/bin/sh`）。例如nextcloud无法网页升级时，可以输入`docker exec -it nextcloud /bin/bash`后，输入`./occ upgrade`进行命令行升级
+>>
+>> 可以使用`save`和`load`命令来导出和导入镜像，比如某个镜像下架了，但是本地部署的机器上还有，这里以minio举例：先用`docker images`查看需要导出的镜像的名称，我这里是`minio/minio:RELEASE.2025-04-22T22-12-26Z`，然后cd到某个目录下，给需要导出的镜像压缩包取一个名字，例如叫做minio-x64，命令为`docker save -o minio-x64.tar minio/minio:RELEASE.2025-04-22T22-12-26Z`，这样那个目录底下就会有保存好的tar文件。需要其他机器上导入镜像的时候，命令为`docker load -i minio-x64.tar`，可用`docker images`来检查有没有成功导入。
 
 ## youshandefeiyang/allinone:latest
 > ,[使用说明](https://github.com/youshandefeiyang/LiveRedirect/blob/main/Golang/README.md)
@@ -644,24 +646,28 @@ hideVersion: true
 >
 > 需要设置目录，注意开启文件哈希会占用很多内存，谨慎开启。刮削有点复杂，所以没搞，具体可以看大佬的博客及其评论区。
 >
+> 不知为何即使限制了内存`mem_limit: 3072m`和`JAVA_TOOL_OPTIONS=-Xmx3g`，容器依然较为卡顿。
+>
 > 并未在N1上部署，因为在N100上光看1篇300MB的PDF，后台的java进程就飙升到了惊人的3.2G，对于只有2G内存的N1盒子实在是捉襟见肘。
 >
 > 由于是内网使用，邮箱密码可以随便输入
 ```
 services:
-  komga:
-    container_name: komga
+  komgabook:
+    container_name: komgabook
     image: gotson/komga:latest
     user: root
     restart: unless-stopped
     network_mode: bridge
+    
     ports:
       - "23333:25600"
     environment:
       - "TZ=Asia/Shanghai"
+      - "JAVA_TOOL_OPTIONS=-Xmx3g"
     volumes:
-      - "/volume1/docker/komga/config:/config"
-      - "/volume1/manga:/comic"
+      - ./config:/config
+      - ./books/:/books
 ```
 
 
@@ -669,18 +675,21 @@ services:
 > 官方搭建[指南](https://www.home-assistant.io/installation/alternative)
 >
 > 后来又安装了[冬瓜OS](https://www.wghaos.com)，还在慢慢摸索
+>
+> 各个版本安装HACS的步骤的[网址](https://hacs.xyz/docs/use/download/download/#to-download-hacs-core)
+>
+> Docker版本没有加载项，所以安装HACS需要通过终端，飞牛或者群晖有终端可以直接进入容器内部，或者使用传统SSH方式，输入`docker exec -it homeassistant /bin/bash`后，输入`wget -O - https://get.hacs.xyz | bash -`，进度条跑完重启容器即可
 ```
 services:
   homeassistant:
-    image: homeassistant/home-assistant:latest
+    image: homeassistant/home-assistant:stable
     container_name: homeassistant
     restart: unless-stopped
-    user: root
-    network_mode: bridge
+    network_mode: host
+    privileged: true
     volumes:
-      - /volume1/docker/homeassistant/config:/config
-    ports:
-      - '8123:8123'
+      - ./config:/config
+      - /etc/localtime:/etc/localtime:ro
     environment:
       - TZ=Asia/Shanghai
 ```
@@ -2105,14 +2114,18 @@ services:
   siyuan:
     image: b3log/siyuan:latest
     restart: unless-stopped
-    user: root
     container_name: siyuan
     network_mode: bridge
     ports:
       - "9070:6806"
     volumes:
-      - /volume1/docker/siyuan/workspace:/siyuan/workspace
-    command: --workspace=/siyuan/workspace --accessAuthCode=password --lang=zh_CN
+      - ./SiYuanLibrary:/siyuan/SiYuanLibrary
+    command: ['serve', '--workspace=/siyuan/SiYuanLibrary/', '--accessAuthCode=访问密码']
+    environment:
+      - TZ=Asia/Shanghai
+      - PUID=1026
+      - PGID=100
+      - SIYUAN_LANG=zh-CN
 ```
 
 ## linuxserver/emulatorjs:1.9.2
@@ -3979,8 +3992,8 @@ services:
       - ENABLE_CALIBRE_SERVER_OPDS=true
       - ENABLE_CALIBREDB_URLLIBRARYPATH=true
       - CALIBRE_SERVER_RESTART_AUTO=true
-      - CALIBRE_SERVER_USER=nashira
-      - CALIBRE_SERVER_PASSWORD=nashira
+      - CALIBRE_SERVER_USER=admin
+      - CALIBRE_SERVER_PASSWORD=password
       - CALIBRE_SERVER_WEB_LANGUAGE=zh_CN
       - CALIBRE_WEB_LANGUAGE=zh_Hans_CN
       - CALIBRE_ASCII_FILENAME=false
@@ -3991,4 +4004,203 @@ services:
     ports:
       - 9298:8080
       - 9299:8083
+```
+
+##  a914599611/ro-music:latest
+>  一个搜索和管理音乐的工具
+
+```
+services:
+  romusic:
+    container_name: romusic
+    image: a914599611/ro-music:latest
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+      - "9302:23330"
+    environment:
+      - "TZ=Asia/Shanghai"
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./data/downloads:/app/data/downloads
+      - ./data/sources:/app/data/sources
+      - ./data/db:/app/data/db
+    mem_limit: 512m
+```
+
+##  palemoky/chinese-poetry-api:latest
+>  中文诗词API
+
+```
+services:
+  poetryapi:
+    container_name: poetryapi
+    image: palemoky/chinese-poetry-api:latest
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+      - "9303:1279"
+    environment:
+      - "TZ=Asia/Shanghai"
+    volumes:
+      - ./data:/app/data
+```
+
+##  mobai1231/catpawopen-fw:latest
+>  猫源转换
+
+```
+services:
+  catpawopenbridge:
+    container_name: catpawopenbridge
+    image: mobai1231/catpawopen-fw:latest
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+      - 9306:2333
+    environment:
+      - CATPAW_SOURCE_URL=https://9280.kstore.vip/cat/index.js.md5
+    volumes:
+      - ./data:/data
+      - ./strm:/strm
+```
+
+##  ghcr.io/maple0517/reader-next:latest
+>  阅读3的fork后的新版本
+
+```
+services:
+  readernext:
+    image: ghcr.io/maple0517/reader-next:latest
+    container_name: readernext
+    restart: unless-stopped
+    network_mode: bridge
+    user: root
+    ports:
+      - 9308:18080
+    volumes:
+      - ./data:/app/storage
+    environment:
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 18080
+      DATABASE_URL: sqlite:/app/storage/reader.db?mode=rwc
+      STORAGE_DIR: /app/storage
+      ASSETS_DIR: /app/storage/assets
+      WEB_ROOT: /app/web/dist
+      LOG_LEVEL: info
+      REQUEST_TIMEOUT_SECS: 15
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:18080/ >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+```
+
+##  ghcr.io/freeok/sonovel:latest
+>  搜小说工具
+
+```
+services:
+  sonovel:
+    image: ghcr.io/freeok/sonovel:latest
+    container_name: sonovel
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+      - 9309:7765
+    volumes:
+      - ./data/config.ini/:/sonovel/config.ini
+      - ./data/downloads:/sonovel/downloads
+      # - ./data/rules:/sonovel/rules
+    environment:
+      JAVA_OPTS: "-Dmode=web"
+```
+
+##  pinyht/pansave:latest
+>  网盘转存工具
+
+```
+services:
+  pansave:
+    image: pinyht/pansave:latest
+    container_name: pansave
+    network_mode: bridge
+    restart: unless-stopped
+    stop_grace_period: 15m
+    ports:
+      - "9310:16868"
+    volumes: 
+      - ./data:/app/data
+      - ./strm:/strm
+    environment:
+      - "TZ=Asia/Shanghai"
+```
+
+##  muxui/pichost:latest
+>  轻量自托管图床，WebP压缩，防盗链，适合NAS与个人博客，项目文档在[这里](https://github.com/O96u/PicHost)
+
+```
+services:
+  pichost:
+    image: muxui/pichost:latest
+    container_name: pichost
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "9315:6892"
+    volumes: 
+      - ./data:/data
+```
+
+##  qazzxxx/cloudimgs:latest
+>  一个本地图床图库，比较偏向于展示，项目文档在[这里](https://github.com/Qazzxxx/cloudimgs)
+
+```
+services:
+  cloudimgs:
+    image: qazzxxx/cloudimgs:latest
+    container_name: cloudimgs
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "9316:3001"
+    volumes: 
+      - ./uploads:/app/uploads:rw
+```
+
+##  ghcr.io/naiba/solitudes:latest
+>  轻量化博客搭建
+
+```
+networks:
+  default:
+    name: solitudes
+
+services:
+  solitudes:
+    image: ghcr.io/naiba/solitudes:latest
+    container_name: solitudes
+    restart: unless-stopped
+    depends_on:
+      - solitudesdb
+    ports:
+      - "9318:8080"
+    volumes:
+      - ./blog-data:/solitudes/data
+    networks:
+      - default
+
+  solitudesdb:
+    image: postgres:13-alpine
+    container_name: solitudesdb
+    restart: unless-stopped
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: solitudesdb
+      POSTGRES_USER: solitudesdb
+      POSTGRES_DB: solitudesdb
+    networks:
+      - default
 ```
