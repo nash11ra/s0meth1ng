@@ -45,7 +45,7 @@
   OpenC1ash新版本可能Tun内核不能启动，尝试的办法有，直接上传YAML文件。`/etc/openclash`目录下只有一行的运行配置文件，直接替换成刚才的文件（也就是下载两遍）。运行时的网络栈设置成System。`/etc/openclash/core/clash_meta`目录下的版本换成[MetaCubeX](https://github.com/MetaCubeX/mihomo/releases)的`linux-amd64`版本（这里由于是X86群晖小主机，所以我选的V1）。确保`版本更新`的`检查更新`能正常下载。以及重启。
   
 # 2. E20C刷机备忘录
-## 更新时间 2026.01.07
+## 更新时间 2026.10.03
 ## 准备工作
 
   找一个5V 2A或者2A以上的TYPE-C线和电源适配器
@@ -60,6 +60,18 @@
 
   当然也能采用[传统方式](https://docs.radxa.com/e/e20c/getting-started/install-os)进行刷写
 
+  这里采用传统的方法，直接通过Maskrom模式刷入EMMC
+  
+  要注意第一行的bootloader的bin文件的地址一定要是0xCCCCCCCC，以及第二行的img固件地址一定要是0x00000000
+  
+  以及要勾选下面的强制按照地址写
+  
+  地址不对的话一定要改成这两个，比如刷写过别的系统之后，这两个地址大概率地址变化了，刷进去会没反应，我曾经就在这停了大半天，怎么刷都无法启动系统
+  
+  具体步骤可以看飞牛官网的这篇[教程](https://help.fnnas.com/articles/v1/arm/arm-rk-usb)
+
+  TF卡的话无论是iStoreOS还是飞牛都能刷入，并且临时启动，就是读写速度慢，不如直接刷进EMMC
+  
 # 3. 电视盒子的一些应用
 ## 更新时间 2026.08.13
 ## 实用应用
